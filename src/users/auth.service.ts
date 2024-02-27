@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { UsersService } from './users.service';
 import { randomBytes, scrypt as _scrypt} from 'crypto';
 import { promisify } from 'util';
+import { AdminReqDto } from './dtos/adminReq.dto';
 
 const scrypt = promisify(_scrypt);
 
@@ -53,5 +54,15 @@ export class AuthService {
         }
 
         return user;
+    }
+
+    async makeAdmin(id:string, body:AdminReqDto){
+        const user = await this.userService.findOne(parseInt(id));
+        if(!user){
+            throw new NotFoundException('Invalid Id');
+        }
+
+        user.isAdmin = body.isAdmin;
+        return this.userService.update(parseInt(id),user);
     }
 }

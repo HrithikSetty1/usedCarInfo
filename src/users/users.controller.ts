@@ -9,6 +9,7 @@ import { Session } from '@nestjs/common';
 import { currentUser } from './decorators/current-user.decorator';
 import { User } from './user.entity';
 import { AuthGuard } from '../gaurds/auth.gaurd';
+import { AdminReqDto } from './dtos/adminReq.dto';
 
 
 @Controller('auth')
@@ -61,15 +62,20 @@ export class UsersController {
         return this.usersService.remove(parseInt(id));
     }
 
-    @Patch('/:id')
-    updateUser(@Param('id') id:string, @Body() body:UpdateUserDto){
-        return this.usersService.update(parseInt(id),body);
-    }
+    // @Patch('/:id')
+    // updateUser(@Param('id') id:string, @Body() body:UpdateUserDto){
+    //     return this.usersService.update(parseInt(id),body);
+    // }
 
     @Post('signin')
     async signin (@Body() body: CreateUser, @Session() session:any){
         const user = await this.authService.signin(body.email,body.password);
         session.userId = user.id;
         return user;
+    }
+
+    @Patch('/:id')
+    async makeAdmin(@Param('id') id:string, @Body() body:AdminReqDto){
+        return this.authService.makeAdmin(id,body);
     }
 }
